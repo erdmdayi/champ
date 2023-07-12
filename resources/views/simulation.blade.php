@@ -25,6 +25,9 @@
             <a href="{{route('fixture')}}" class="btn btn-danger">Reset Data</a>
         </div>
     </div>
+    <div class="row mt-5" id="completedFixture">
+
+    </div>
 @endsection
 
 @push('scripts')
@@ -40,7 +43,10 @@
                 .then(function (response) {
                     console.dir(response.data.data);
                     alert(response.data.message);
-                    location.reload();
+                    $('#nextMatch').html(response.data.data.nextMatch);
+                    $('#standing').html(response.data.data.standing);
+                    $('#prediction').html(response.data.data.prediction);
+                    $('#completedFixture').html(response.data.data.fixture);
                 })
                 .catch(function (error) {
                     $('#playAll').removeAttr('disabled');

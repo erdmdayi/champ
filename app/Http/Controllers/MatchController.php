@@ -12,6 +12,7 @@ class MatchController extends Controller
     {
         $matches = Matches::query()->where('status', false)->orderBy('week')->get();
         $fixtures = [];
+        $weeklyCount = 0;
         foreach ($matches as $match) {
             $homeTeamStanding = Standing::query()->where('team_id', $match->home_team)->first();
             $awayTeamStanding = Standing::query()->where('team_id', $match->away_team)->first();
@@ -39,16 +40,32 @@ class MatchController extends Controller
             $awayTeamStanding->save();
             $match->save();
 
-            $fixtures[$match->id] = [
+            $fixtures[$match->week][$weeklyCount] = [
                 'home_team' =>  $homeTeamStanding->team->name,
                 'away_team' =>  $awayTeamStanding->team->name,
                 'score' =>  $homeTeamScore . ' : ' . $awayTeamScore,
+                'week' => $match->week
             ];
+
+            $weeklyCount  = $weeklyCount == 0 ? ($weeklyCount+1) : 0;
         }
+
+        $data['fixture'] = view('components.result', ['fixture' => $fixtures])->render();
+
+        $standing = Standing::with('team')->orderByDesc('points')->orderByDesc('goal_drawn')->get();
+        $data['standing'] = view('components.standing', ['standing' => $standing])->render();
+
+        $prediction = (new \App\PreditionHelper())->getTeamPreditions();
+        $data['prediction'] = view('components.prediction', ['prediction' => $prediction])->render();
+
+        $nextMatch = Matches::query()->where('status', 0)->with('awayTeam', 'homeTeam')->orderBy('id')->limit(2)->get();
+        $data['nextMatch'] = view('components.week', ['nextMatch' => $nextMatch])->render();
+
+
         $champion = Standing::with('team')->orderByDesc('points')->orderByDesc('goal_drawn')->first();
         return response()->json([
             'success' => true,
-            'data' => $fixtures,
+            'data' => $data,
             'message' => 'All matches have been played! *** CHAMPION '. strtoupper($champion->team->name) .' ***'
         ]);
     }
@@ -92,13 +109,14 @@ class MatchController extends Controller
             $champion = Standing::with('team')->orderByDesc('points')->orderByDesc('goal_drawn')->first();
             $message = 'All matches have been played! *** CHAMPION '. strtoupper($champion->team->name) .' ***';
         }
-        $data['nextMatch'] = view('components.week', ['nextMatch' => $nextMatch])->render();;
 
-        $standing = Standing::with('team')->orderByDesc('points')->get();
+        $data['nextMatch'] = view('components.week', ['nextMatch' => $nextMatch])->render();
+
+        $standing = Standing::with('team')->orderByDesc('points')->orderByDesc('goal_drawn')->get();
         $data['standing'] = view('components.standing', ['standing' => $standing])->render();
 
         $prediction = (new \App\PreditionHelper())->getTeamPreditions();
-        $data['prediction'] = view('components.prediction', ['prediction' => $prediction])->render();;
+        $data['prediction'] = view('components.prediction', ['prediction' => $prediction])->render();
 
         $data['champion'] = $champion;
 
