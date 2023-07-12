@@ -47,6 +47,7 @@
                     $('#standing').html(response.data.data.standing);
                     $('#prediction').html(response.data.data.prediction);
                     $('#completedFixture').html(response.data.data.fixture);
+                    $('#playMatch').attr('disabled','disabled');
                 })
                 .catch(function (error) {
                     $('#playAll').removeAttr('disabled');
