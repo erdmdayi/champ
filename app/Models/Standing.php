@@ -15,6 +15,7 @@ class Standing extends Model
     {
         return $this->belongsTo(Team::class);
     }
+
     public function won($goalDrawn)
     {
         $this->played     += 1;

@@ -26,58 +26,10 @@ class HomeController extends Controller
 
     public function simulation()
     {
-        $standing = Standing::with('team')->orderByDesc('points')->get();
+        $standing = Standing::with('team')->orderByDesc('points')->orderByDesc('goal_drawn')->get();
         $nextMatch = Matches::query()->where('status', 0)->with('awayTeam', 'homeTeam')->orderBy('id')->limit(2)->get();
         $prediction = (new \App\PreditionHelper())->getTeamPreditions();
 
         return view('simulation', ['standing' => $standing, 'nextMatch' => $nextMatch, 'prediction' => $prediction]);
-    }
-
-    public function simulateAllMatches()
-    {
-        $matches = Matches::all();
-        $fixtures = [];
-        foreach ($matches as $match) {
-            $homeTeamStanding = Standing::query()->where('team_id', $match->home_team)->first();
-            $awayTeamStanding = Standing::query()->where('team_id', $match->away_team)->first();
-            $homeTeamScore = rand(0, 5);
-            $awayTeamScore = rand(0, 5 - $awayTeamStanding->id);
-
-            $goalDrawn = abs($awayTeamScore - $homeTeamScore);
-
-            $match->home_team_goal = $homeTeamScore;
-            $match->away_team_goal = $awayTeamScore;
-
-            if ($homeTeamScore > $awayTeamScore) {
-                $homeTeamStanding->points += 3;
-                $homeTeamStanding->won($goalDrawn);
-                $awayTeamStanding->lose($goalDrawn);
-            } elseif ($homeTeamScore < $awayTeamScore) {
-                $awayTeamStanding->points += 3;
-                $homeTeamStanding->lose($goalDrawn);
-                $awayTeamStanding->won($goalDrawn);
-            } else {
-                $homeTeamStanding->points += 1;
-                $awayTeamStanding->points += 1;
-                $homeTeamStanding->draw();
-                $awayTeamStanding->draw();
-            }
-
-            $homeTeamStanding->save();
-            $awayTeamStanding->save();
-            $match->save();
-
-            $fixtures[$match->id] = [
-                'home_team' =>  $homeTeamStanding->team->name,
-                'away_team' =>  $awayTeamStanding->team->name,
-                'score' =>  $homeTeamScore . ' : ' . $awayTeamScore,
-            ];
-        }
-        $champion = Standing::with('team')->orderByDesc('points')->first();
-        return response()->json([
-            'success' => true,
-            'fixtures' => $fixtures,
-            'message' => 'All matches have been played! *** CHAMPION '. strtoupper($champion->team->name) .' ***'
-        ]);
     }
 }

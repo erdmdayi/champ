@@ -15,14 +15,14 @@ class PreditionHelper
         $firstTeamPoint   = $teams[1]['points'];
 
         $rawPrediction = [];
-        foreach ($teams as $rank => $item) {
-            $rawPrediction[$item->team->name] = $this->calculateTeamPreditions($item, $rank, $remainedPoints, $firstTeamPoint);
+        foreach ($teams as $number => $item) {
+            $rawPrediction[$item->team->name] = $this->calculateTeamPreditions($item, $number, $remainedPoints, $firstTeamPoint);
         }
 
         return $this->calculateChanceInPercentage($rawPrediction);
     }
 
-    public function calculateTeamPreditions($item, $rank, $remainedPoints, $topTeamPoint)
+    public function calculateTeamPreditions($item, $number, $remainedPoints, $topTeamPoint)
     {
         if ($remainedPoints + $item['points'] < $topTeamPoint) {
             return 0;
@@ -43,7 +43,7 @@ class PreditionHelper
         }
 
         $chanceByRemainedMatches = ($homeChance + $awayChance);
-        $chanceIncludingCurrentRank = $chanceByRemainedMatches - ($rank / 2);
+        $chanceIncludingCurrentRank = $chanceByRemainedMatches - ($number / 2);
         $chanceIncludingPointsDifference = $chanceIncludingCurrentRank - (($topTeamPoint - $item['points']) / 2);
         return $chanceIncludingPointsDifference > 0 ? $chanceIncludingPointsDifference : 0;
     }

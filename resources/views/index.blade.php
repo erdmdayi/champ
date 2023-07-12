@@ -18,7 +18,7 @@
                     @endforeach
                 </tbody>
             </table>
-            <a href="{{route('fixture')}}" class="btn btn-info">Generate Fixture</a>
+            <a href="{{route('fixture')}}" class="btn btn-info mt-4">Generate Fixture</a>
         </div>
     </div>
 @endsection

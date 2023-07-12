@@ -21,7 +21,7 @@
                 </table>
             </div>
         @endforeach
-        <div class="col-md-12">
+        <div class="col-md-12 mt-4">
             <a href="{{route('simulation')}}" class="btn btn-info">Start Simulation</a>
         </div>
     </div>

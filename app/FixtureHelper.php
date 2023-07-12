@@ -17,7 +17,6 @@ class FixtureHelper
 
         for ($week = 1; $week <= $weeks; $week++) {
             $matches = array();
-
             for ($i = 0; $i < $totalTeams / 2; $i++) {
                 $homeTeamIndex = $i;
                 $awayTeamIndex = $totalTeams - 1 - $i;
@@ -38,8 +37,8 @@ class FixtureHelper
 
             $fixture[$week] = $matches;
         }
+        $this->resetStandingList();
         $this->generateMatches($fixture);
-        $this->clearStandingList();
         return $fixture;
     }
 
@@ -66,7 +65,7 @@ class FixtureHelper
         return true;
     }
 
-    public function clearStandingList()
+    public function resetStandingList()
     {
         $standing = Standing::all();
         foreach($standing as $item){

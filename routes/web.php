@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MatchController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,4 +21,6 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [HomeController::class, 'index'])->name('index');
 Route::get('/fixture', [HomeController::class, 'fixture'])->name('fixture');
 Route::get('/simulation', [HomeController::class, 'simulation'])->name('simulation');
-Route::get('/simulate-all-matches', [HomeController::class, 'simulateAllMatches']);
+
+Route::get('/simulate-all-matches', [MatchController::class, 'simulateAllMatches']);
+Route::get('/simulate-match', [MatchController::class, 'simulateMatch']);
